@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import QRCode from "qrcode";
 import { useConnection, useSignMessage } from "wagmi";
 import { isAddressEqual } from "viem";
@@ -23,6 +23,7 @@ interface Props {
 /**
  * Shows the entry QR for a pass. The QR holds only identifiers plus an optional holder
  * signature (see lib/entry.ts); it is rendered locally and nothing is sent anywhere.
+ * Callers mount it only while it is shown, so its state resets on close.
  */
 export function PassQrModal({ open, onClose, pass, event }: Props) {
   const { address } = useConnection();
@@ -32,13 +33,6 @@ export function PassQrModal({ open, onClose, pass, event }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   const isHolder = !!address && isAddressEqual(address, pass.owner);
-
-  useEffect(() => {
-    if (!open) {
-      setQr(null);
-      setError(null);
-    }
-  }, [open]);
 
   async function render(text: string, issuedAt?: number) {
     const url = await QRCode.toDataURL(text, { errorCorrectionLevel: "M", margin: 1, width: 640 });

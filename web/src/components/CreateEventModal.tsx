@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { parseEventLogs } from "viem";
 import { partisAbi } from "@/lib/abi";
 import { buildEventConfig, LIMITS, type EventFormValues } from "@/lib/eventForm";
@@ -38,17 +38,15 @@ function defaults(): EventFormValues {
  * form reads as the event it produces, so there is nothing to interpret.
  */
 export function CreateEventModal({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const [v, setV] = useState<EventFormValues>(defaults);
+  const [form, setV] = useState<EventFormValues>(defaults);
+  // The default date depends on the clock, so derive it only while open (never in prerender).
+  const v = open && !form.date ? { ...form, date: weekFromNow() } : form;
   const [created, setCreated] = useState<bigint | null>(null);
   const [touched, setTouched] = useState(false);
   const tx = usePartisTx();
 
-  useEffect(() => {
-    if (open) setV((prev) => (prev.date ? prev : { ...prev, date: weekFromNow() }));
-  }, [open]);
-
   const set = <K extends keyof EventFormValues>(key: K, value: EventFormValues[K]) =>
-    setV((prev) => ({ ...prev, [key]: value }));
+    setV({ ...v, [key]: value });
 
   const built = buildEventConfig(v, open ? nowSeconds() : 0);
 

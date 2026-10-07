@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 interface ToastMessage {
   id: number;
@@ -31,10 +31,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => () => void (timer.current && clearTimeout(timer.current)), []);
 
-  const api = useRef<ToastApi>({ show: (t) => push(t, "info"), error: (t) => push(t, "error") });
+  const api = useMemo<ToastApi>(() => ({ show: (t) => push(t, "info"), error: (t) => push(t, "error") }), [push]);
 
   return (
-    <ToastContext.Provider value={api.current}>
+    <ToastContext.Provider value={api}>
       {children}
       <div role="status" aria-live="polite" aria-atomic="true">
         {toast && (

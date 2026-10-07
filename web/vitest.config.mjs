@@ -1,1 +1,3 @@
-export default { test: { include: ["src/**/*.test.ts"] } };
+const config = { test: { include: ["src/**/*.test.ts"] } };
+
+export default config;
