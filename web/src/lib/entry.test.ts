@@ -23,7 +23,8 @@ describe("entry QR", () => {
     if (!parsed.ok) throw new Error(parsed.error);
     expect(parsed.payload.signature).toBe(signature);
 
-    const rebuilt = entryMessage({ chainId: 968, contract, ...parsed.payload, issuedAt: parsed.payload.issuedAt! });
+    const { eventId, tokenId } = parsed.payload;
+    const rebuilt = entryMessage({ chainId: 968, contract, eventId, tokenId, issuedAt: parsed.payload.issuedAt! });
     expect(await verifyMessage({ address: account.address, message: rebuilt, signature })).toBe(true);
     // A signature for pass 41 must not validate pass 42.
     const other = entryMessage({ chainId: 968, contract, eventId: 3n, tokenId: 42n, issuedAt });
