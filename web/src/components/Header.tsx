@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { targetChain } from "@/lib/config";
 import { WalletButton } from "./WalletButton";
 
@@ -13,12 +13,30 @@ const NAV = [
   { href: "/check-in", label: "Check-In" },
 ];
 
-export function Header() {
+/** Nav links with the current page marked; reads the URL so it lives inside Suspense. */
+function NavLinks({ onNavigate }: { onNavigate: () => void }) {
   const pathname = usePathname();
-  const [open, setOpen] = useState(false);
-
   // Close the mobile menu after navigating.
-  useEffect(() => setOpen(false), [pathname]);
+  useEffect(() => onNavigate(), [pathname, onNavigate]);
+  return NAV.map((item) => {
+    const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+    return (
+      <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined}>
+        {item.label}
+      </Link>
+    );
+  });
+}
+
+const staticLinks = NAV.map((item) => (
+  <Link key={item.href} href={item.href}>
+    {item.label}
+  </Link>
+));
+
+export function Header() {
+  const [open, setOpen] = useState(false);
+  const close = useCallback(() => setOpen(false), []);
 
   return (
     <header className="header">
@@ -33,14 +51,9 @@ export function Header() {
       </Link>
 
       <nav id="site-nav" className={`nav${open ? " open" : ""}`} aria-label="Main">
-        {NAV.map((item) => {
-          const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
-          return (
-            <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined}>
-              {item.label}
-            </Link>
-          );
-        })}
+        <Suspense fallback={staticLinks}>
+          <NavLinks onNavigate={close} />
+        </Suspense>
       </nav>
 
       <div className="header-actions">
