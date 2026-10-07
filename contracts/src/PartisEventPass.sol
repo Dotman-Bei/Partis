@@ -512,11 +512,7 @@ contract PartisEventPass is ERC721Enumerable, ReentrancyGuard {
     }
 
     /// @notice Token ids issued for an event, in issuance order. Bounded by MAX_PAGE_SIZE.
-    function getEventTokenIds(uint256 eventId, uint256 offset, uint256 limit)
-        external
-        view
-        returns (uint256[] memory)
-    {
+    function getEventTokenIds(uint256 eventId, uint256 offset, uint256 limit) external view returns (uint256[] memory) {
         return _slice(_eventTokenIds[eventId], offset, limit);
     }
 
@@ -575,11 +571,7 @@ contract PartisEventPass is ERC721Enumerable, ReentrancyGuard {
         if (!ok) revert PaymentFailed();
     }
 
-    function _slice(uint256[] storage arr, uint256 offset, uint256 limit)
-        internal
-        view
-        returns (uint256[] memory out)
-    {
+    function _slice(uint256[] storage arr, uint256 offset, uint256 limit) internal view returns (uint256[] memory out) {
         if (limit > MAX_PAGE_SIZE) revert PageTooLarge(limit);
         uint256 len = arr.length;
         if (offset >= len) return out;
