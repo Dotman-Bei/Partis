@@ -151,6 +151,7 @@ contract PartisEventPass is ERC721Enumerable, ReentrancyGuard {
     error InvalidStaff(address account);
     error StaffLimitReached(uint256 eventId);
     error PassNotValid(uint256 eventId, uint256 tokenId, PassCheck reason);
+    error PassAlreadyUsed(uint256 tokenId);
 
     // ---------------------------------------------------------------------
     // Modifiers
@@ -398,6 +399,16 @@ contract PartisEventPass is ERC721Enumerable, ReentrancyGuard {
     // ---------------------------------------------------------------------
     // Internal
     // ---------------------------------------------------------------------
+
+    /// @dev Transfer rule (PRD §14): passes move freely until check-in. A checked-in pass is a
+    ///      permanent attendance record and cannot be transferred, so "used" can never be shed.
+    function _update(address to, uint256 tokenId, address auth) internal override returns (address from) {
+        from = _ownerOf(tokenId);
+        if (from != address(0) && to != address(0) && _passes[tokenId].checkedInAt != 0) {
+            revert PassAlreadyUsed(tokenId);
+        }
+        return super._update(to, tokenId, auth);
+    }
 
     function _existingEvent(uint256 eventId) internal view returns (EventData storage e) {
         e = _events[eventId];
