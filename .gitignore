@@ -20,3 +20,4 @@ contracts/broadcast/*/31337/
 web/test-results/
 web/playwright-report/
 web/e2e/screenshots/
+.anvil-state.json
