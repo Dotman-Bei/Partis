@@ -66,7 +66,9 @@ export function PassQrModal({ open, onClose, pass, event }: Props) {
     await render(encodeEntry({ chainId: targetChain.id, eventId: pass.eventId, tokenId: pass.tokenId }));
   }
 
-  const remaining = qr?.issuedAt !== undefined ? qr.issuedAt + ENTRY_TTL_SECONDS - now : null;
+  // `now` ticks once a second and can trail the signing time; never show more than the TTL.
+  const remaining =
+    qr?.issuedAt !== undefined ? Math.min(ENTRY_TTL_SECONDS, qr.issuedAt + ENTRY_TTL_SECONDS - now) : null;
   const expired = remaining !== null && remaining <= 0;
 
   return (
