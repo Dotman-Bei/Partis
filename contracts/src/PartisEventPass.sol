@@ -4,6 +4,7 @@ pragma solidity 0.8.28;
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {ERC721Enumerable} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {PartisPassRenderer} from "./PartisPassRenderer.sol";
 import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 /// @title PartisEventPass
@@ -123,6 +124,9 @@ contract PartisEventPass is ERC721Enumerable, ReentrancyGuard {
     // Storage
     // ---------------------------------------------------------------------
 
+    /// @notice Immutable on-chain metadata renderer.
+    PartisPassRenderer public immutable renderer;
+
     uint256 private _eventCount;
     mapping(uint256 eventId => EventData) private _events;
     mapping(address organizer => uint256[]) private _organizerEvents;
@@ -191,7 +195,9 @@ contract PartisEventPass is ERC721Enumerable, ReentrancyGuard {
         _;
     }
 
-    constructor() ERC721("Partis Event Pass", "PARTIS") {}
+    constructor(PartisPassRenderer renderer_) ERC721("Partis Event Pass", "PARTIS") {
+        renderer = renderer_;
+    }
 
     // ---------------------------------------------------------------------
     // Organizer: event lifecycle
@@ -461,6 +467,26 @@ contract PartisEventPass is ERC721Enumerable, ReentrancyGuard {
         returns (uint256[] memory ids)
     {
         return _slice(_organizerEvents[organizer], offset, limit);
+    }
+
+    /// @notice Fully on-chain metadata (JSON + SVG) reflecting live pass state.
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
+        _requireOwned(tokenId);
+        PassData storage p = _passes[tokenId];
+        EventData storage e = _events[p.eventId];
+        return renderer.tokenURI(
+            PartisPassRenderer.RenderInput({
+                tokenId: tokenId,
+                eventId: p.eventId,
+                eventName: e.name,
+                venue: e.venue,
+                passName: e.passName,
+                organizer: e.organizer,
+                startTime: e.startTime,
+                checkedIn: p.checkedInAt != 0,
+                cancelled: e.status == EventStatus.Cancelled
+            })
+        );
     }
 
     function isCheckInOperator(uint256 eventId, address account) public view returns (bool) {

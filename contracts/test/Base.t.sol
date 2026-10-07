@@ -3,6 +3,7 @@ pragma solidity 0.8.28;
 
 import {Test} from "forge-std/Test.sol";
 import {PartisEventPass} from "../src/PartisEventPass.sol";
+import {PartisPassRenderer} from "../src/PartisPassRenderer.sol";
 
 abstract contract PartisBase is Test {
     PartisEventPass internal partis;
@@ -17,7 +18,7 @@ abstract contract PartisBase is Test {
 
     function setUp() public virtual {
         vm.warp(T0);
-        partis = new PartisEventPass();
+        partis = new PartisEventPass(new PartisPassRenderer());
         vm.deal(alice, 100 ether);
         vm.deal(bob, 100 ether);
         vm.deal(mallory, 100 ether);
