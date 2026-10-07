@@ -17,3 +17,6 @@ contracts/cache/
 contracts/foundry-pp/
 contracts/deployments/31337.json
 contracts/broadcast/*/31337/
+web/test-results/
+web/playwright-report/
+web/e2e/screenshots/
