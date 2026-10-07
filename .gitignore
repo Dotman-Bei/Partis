@@ -1,0 +1,17 @@
+# deps
+node_modules/
+# next
+web/.next/
+web/out/
+web/next-env.d.ts
+*.tsbuildinfo
+# foundry
+contracts/out/
+contracts/cache/
+contracts/broadcast/*/31337/
+# env
+.env
+.env.*
+!.env.example
+# os
+.DS_Store
