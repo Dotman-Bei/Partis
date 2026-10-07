@@ -21,6 +21,17 @@ cast wallet address --account partis-deployer
 
 ## 1. Testnet (BOT Chain Testnet, chain 968)
 
+**Quick path:** copy `contracts/.env.example` to `contracts/.env` (git-ignored), set
+`PRIVATE_KEY` to a fresh deployer wallet funded from the faucet, then run:
+
+```bash
+./scripts/deploy-testnet.sh
+```
+
+It re-checks the chain id, checks the deployer's balance, runs the tests, deploys, verifies on
+BOTScan, and points `web/.env.local` at the new contract. The manual steps below do the same
+with an encrypted Foundry keystore instead of a key in a file.
+
 1. Fund the deployer with tBOT: https://faucet.botchain.ai/basic (10 tBOT / 24h).
 2. Run the full test suite:
    ```bash

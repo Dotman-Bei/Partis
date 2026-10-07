@@ -131,7 +131,8 @@ The web app runs against one chain per build (`NEXT_PUBLIC_CHAIN_ID`, `NEXT_PUBL
 | BOT Chain Testnet | *not deployed yet* | *not deployed yet* |
 | BOT Chain Mainnet | *not deployed yet* | *not deployed yet* |
 
-Deploying needs a funded deployer wallet. Follow [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md); the
+Deploying needs a funded deployer wallet: fill in `contracts/.env` (from `.env.example`) and run
+`./scripts/deploy-testnet.sh`, or follow [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). The
 addresses land in `contracts/deployments/<chainId>.json`, which should be committed and linked here.
 
 ## Testing
