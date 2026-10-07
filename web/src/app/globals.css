@@ -171,7 +171,7 @@ p {
   gap: 10px;
 }
 
-.menu-toggle {
+.btn.menu-toggle {
   display: none;
 }
 
@@ -1251,7 +1251,7 @@ p {
     font-size: 15px;
   }
 
-  .menu-toggle {
+  .btn.menu-toggle {
     display: inline-flex;
   }
 
@@ -1318,6 +1318,15 @@ p {
 
   .brand p {
     display: none;
+  }
+
+  .header-actions {
+    gap: 6px;
+  }
+
+  .header-actions .btn {
+    padding: 10px 12px;
+    font-size: 13px;
   }
 
   .strip {
