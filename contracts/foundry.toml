@@ -23,3 +23,12 @@ bot_mainnet = "https://rpc.botchain.ai"
 [etherscan]
 bot_testnet = { key = "blockscout", chain = 968, url = "https://scan.bohr.life/api/" }
 bot_mainnet = { key = "blockscout", chain = 677, url = "https://scan.botchain.ai/api/" }
+
+[profile.default.invariant]
+runs = 64
+depth = 64
+fail_on_revert = false
+
+[profile.ci.invariant]
+runs = 256
+depth = 128
