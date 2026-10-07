@@ -99,6 +99,26 @@ contract PartisEventPass is ERC721Enumerable, ReentrancyGuard {
         uint128 pricePaid;
     }
 
+    /// @notice A pass joined with its live ownership, for frontends.
+    struct PassView {
+        uint256 tokenId;
+        uint256 eventId;
+        address owner;
+        uint64 issuedAt;
+        uint64 checkedInAt;
+        address checkedInBy;
+        uint128 pricePaid;
+    }
+
+    struct Stats {
+        uint256 events;
+        uint256 organizers;
+        uint256 attendees;
+        uint256 passesIssued;
+        uint256 checkIns;
+        uint256 paidVolume;
+    }
+
     // ---------------------------------------------------------------------
     // Storage
     // ---------------------------------------------------------------------
@@ -389,6 +409,46 @@ contract PartisEventPass is ERC721Enumerable, ReentrancyGuard {
         for (uint256 i; i < n; ++i) {
             page[i] = _events[offset + i + 1];
         }
+    }
+
+    /// @notice Events for an explicit list of ids. Unknown ids revert. Bounded by MAX_PAGE_SIZE.
+    function getEventsByIds(uint256[] calldata ids) external view returns (EventData[] memory out) {
+        if (ids.length > MAX_PAGE_SIZE) revert PageTooLarge(ids.length);
+        out = new EventData[](ids.length);
+        for (uint256 i; i < ids.length; ++i) {
+            out[i] = _existingEvent(ids[i]);
+        }
+    }
+
+    /// @notice Pass state plus current owner for each id. Nonexistent or burned ids return owner = 0.
+    function getPasses(uint256[] calldata tokenIds) external view returns (PassView[] memory out) {
+        if (tokenIds.length > MAX_PAGE_SIZE) revert PageTooLarge(tokenIds.length);
+        out = new PassView[](tokenIds.length);
+        for (uint256 i; i < tokenIds.length; ++i) {
+            uint256 id = tokenIds[i];
+            PassData storage p = _passes[id];
+            out[i] = PassView({
+                tokenId: id,
+                eventId: p.eventId,
+                owner: _ownerOf(id),
+                issuedAt: p.issuedAt,
+                checkedInAt: p.checkedInAt,
+                checkedInBy: p.checkedInBy,
+                pricePaid: p.pricePaid
+            });
+        }
+    }
+
+    /// @notice Platform-wide counters, all derived from on-chain actions.
+    function stats() external view returns (Stats memory) {
+        return Stats({
+            events: _eventCount,
+            organizers: totalOrganizers,
+            attendees: totalAttendees,
+            passesIssued: totalPassesIssued,
+            checkIns: totalCheckIns,
+            paidVolume: totalPaidVolume
+        });
     }
 
     function organizerEventCount(address organizer) external view returns (uint256) {
