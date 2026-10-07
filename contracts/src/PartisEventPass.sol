@@ -4,6 +4,7 @@ pragma solidity 0.8.28;
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {ERC721Enumerable} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 /// @title PartisEventPass
 /// @notice On-chain events and event passes for BOT Chain. Each pass is an ERC-721 token that
@@ -13,6 +14,8 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol
 ///         to a single event and gated on that event's organizer (or its check-in staff).
 ///         All loops are bounded by constants.
 contract PartisEventPass is ERC721Enumerable, ReentrancyGuard {
+    using EnumerableSet for EnumerableSet.AddressSet;
+
     // ---------------------------------------------------------------------
     // Limits
     // ---------------------------------------------------------------------
@@ -23,6 +26,7 @@ contract PartisEventPass is ERC721Enumerable, ReentrancyGuard {
     uint256 public constant MAX_PASS_NAME_LENGTH = 40;
     uint256 public constant MAX_SUPPLY_PER_EVENT = 100_000;
     uint256 public constant MAX_PAGE_SIZE = 100;
+    uint256 public constant MAX_STAFF_PER_EVENT = 50;
 
     // ---------------------------------------------------------------------
     // Types
@@ -75,6 +79,18 @@ contract PartisEventPass is ERC721Enumerable, ReentrancyGuard {
         uint256 proceeds;
     }
 
+    /// @notice Result of verifying a pass for a given event at the current block time.
+    enum PassCheck {
+        Valid,
+        EventNotFound,
+        PassNotFound,
+        WrongEvent,
+        AlreadyCheckedIn,
+        EventCancelled,
+        CheckInNotOpen,
+        CheckInClosed
+    }
+
     struct PassData {
         uint256 eventId;
         uint64 issuedAt;
@@ -96,11 +112,13 @@ contract PartisEventPass is ERC721Enumerable, ReentrancyGuard {
     mapping(uint256 eventId => uint256[]) private _eventTokenIds;
     mapping(uint256 eventId => mapping(address account => bool)) private _claimed;
     mapping(address account => bool) private _isAttendee;
+    mapping(uint256 eventId => EnumerableSet.AddressSet) private _staff;
 
     uint256 public totalOrganizers;
     uint256 public totalAttendees;
     uint256 public totalPassesIssued;
     uint256 public totalPaidVolume;
+    uint256 public totalCheckIns;
 
     // ---------------------------------------------------------------------
     // Events
@@ -111,6 +129,8 @@ contract PartisEventPass is ERC721Enumerable, ReentrancyGuard {
     );
     event EventDetailsUpdated(uint256 indexed eventId);
     event SalesPausedSet(uint256 indexed eventId, bool paused);
+    event StaffUpdated(uint256 indexed eventId, address indexed account, bool authorized);
+    event CheckedIn(uint256 indexed eventId, uint256 indexed tokenId, address indexed holder, address operator);
     event PassIssued(uint256 indexed eventId, uint256 indexed tokenId, address indexed holder, uint256 pricePaid);
 
     // ---------------------------------------------------------------------
@@ -127,6 +147,10 @@ contract PartisEventPass is ERC721Enumerable, ReentrancyGuard {
     error SoldOut(uint256 eventId);
     error IncorrectPayment(uint256 expected, uint256 received);
     error AlreadyClaimed(uint256 eventId, address account);
+    error NotCheckInOperator(uint256 eventId, address account);
+    error InvalidStaff(address account);
+    error StaffLimitReached(uint256 eventId);
+    error PassNotValid(uint256 eventId, uint256 tokenId, PassCheck reason);
 
     // ---------------------------------------------------------------------
     // Modifiers
@@ -190,6 +214,61 @@ contract PartisEventPass is ERC721Enumerable, ReentrancyGuard {
         if (e.status == EventStatus.Cancelled) revert EventIsCancelled(eventId);
         e.salesPaused = paused;
         emit SalesPausedSet(eventId, paused);
+    }
+
+    /// @notice Grants or revokes check-in rights for `account` on one event.
+    /// @dev    Staff can only verify and check in passes; they cannot configure, cancel or withdraw.
+    function setStaff(uint256 eventId, address account, bool authorized) external onlyOrganizer(eventId) {
+        if (account == address(0) || account == msg.sender) revert InvalidStaff(account);
+        EnumerableSet.AddressSet storage set = _staff[eventId];
+        if (authorized) {
+            if (set.length() >= MAX_STAFF_PER_EVENT) revert StaffLimitReached(eventId);
+            if (!set.add(account)) return;
+        } else if (!set.remove(account)) {
+            return;
+        }
+        emit StaffUpdated(eventId, account, authorized);
+    }
+
+    // ---------------------------------------------------------------------
+    // Organizer / staff: entrance verification
+    // ---------------------------------------------------------------------
+
+    /// @notice Records check-in for `tokenId` at `eventId`. Only the organizer or authorized staff.
+    /// @dev    `eventId` is the event the operator is admitting people to, not a value read from the
+    ///         pass, so a valid pass for a different event is rejected as WrongEvent.
+    function checkIn(uint256 eventId, uint256 tokenId) external {
+        EventData storage e = _existingEvent(eventId);
+        if (msg.sender != e.organizer && !_staff[eventId].contains(msg.sender)) {
+            revert NotCheckInOperator(eventId, msg.sender);
+        }
+        (PassCheck result, address holder) = verifyPass(eventId, tokenId);
+        if (result != PassCheck.Valid) revert PassNotValid(eventId, tokenId, result);
+
+        PassData storage p = _passes[tokenId];
+        p.checkedInAt = uint64(block.timestamp);
+        p.checkedInBy = msg.sender;
+        e.checkedIn++;
+        totalCheckIns++;
+
+        emit CheckedIn(eventId, tokenId, holder, msg.sender);
+    }
+
+    /// @notice Verifies a pass against current chain state. Never reverts.
+    /// @return result Valid, or the first reason the pass must be refused.
+    /// @return holder Current owner of the pass (zero if it does not exist).
+    function verifyPass(uint256 eventId, uint256 tokenId) public view returns (PassCheck result, address holder) {
+        EventData storage e = _events[eventId];
+        if (e.organizer == address(0)) return (PassCheck.EventNotFound, address(0));
+        holder = _ownerOf(tokenId);
+        if (holder == address(0)) return (PassCheck.PassNotFound, address(0));
+        PassData storage p = _passes[tokenId];
+        if (p.eventId != eventId) return (PassCheck.WrongEvent, holder);
+        if (p.checkedInAt != 0) return (PassCheck.AlreadyCheckedIn, holder);
+        if (e.status == EventStatus.Cancelled) return (PassCheck.EventCancelled, holder);
+        if (block.timestamp < e.checkInStart) return (PassCheck.CheckInNotOpen, holder);
+        if (block.timestamp >= e.checkInEnd) return (PassCheck.CheckInClosed, holder);
+        return (PassCheck.Valid, holder);
     }
 
     // ---------------------------------------------------------------------
@@ -267,6 +346,16 @@ contract PartisEventPass is ERC721Enumerable, ReentrancyGuard {
         returns (uint256[] memory ids)
     {
         return _slice(_organizerEvents[organizer], offset, limit);
+    }
+
+    function isCheckInOperator(uint256 eventId, address account) public view returns (bool) {
+        address org = _events[eventId].organizer;
+        return org != address(0) && (account == org || _staff[eventId].contains(account));
+    }
+
+    /// @notice Staff list for an event. Bounded by MAX_STAFF_PER_EVENT.
+    function getStaff(uint256 eventId) external view returns (address[] memory) {
+        return _staff[eventId].values();
     }
 
     function hasClaimed(uint256 eventId, address account) external view returns (bool) {
