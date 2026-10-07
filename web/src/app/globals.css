@@ -339,6 +339,10 @@ p {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.meta.four {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .tile {
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -1298,7 +1302,8 @@ p {
     width: calc(100% - 22px);
   }
 
-  .meta {
+  .meta,
+  .meta.four {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 

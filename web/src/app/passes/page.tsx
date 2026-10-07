@@ -59,7 +59,7 @@ function Passes() {
           <span className="card-id">Profile</span>
           <AddressLink address={address} />
         </div>
-        <div className="meta" style={{ gridTemplateColumns: "repeat(4, minmax(0, 1fr))" }}>
+        <div className="meta four">
           <Tile label="Total passes">{all.length}</Tile>
           <Tile label="Active">{active.length}</Tile>
           <Tile label="Checked in">{checkedIn.length}</Tile>
