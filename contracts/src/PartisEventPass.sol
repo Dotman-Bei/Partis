@@ -131,6 +131,9 @@ contract PartisEventPass is ERC721Enumerable, ReentrancyGuard {
     event SalesPausedSet(uint256 indexed eventId, bool paused);
     event StaffUpdated(uint256 indexed eventId, address indexed account, bool authorized);
     event CheckedIn(uint256 indexed eventId, uint256 indexed tokenId, address indexed holder, address operator);
+    event EventCancelled(uint256 indexed eventId);
+    event PassRefunded(uint256 indexed eventId, uint256 indexed tokenId, address indexed holder, uint256 amount);
+    event ProceedsWithdrawn(uint256 indexed eventId, address indexed organizer, uint256 amount);
     event PassIssued(uint256 indexed eventId, uint256 indexed tokenId, address indexed holder, uint256 pricePaid);
 
     // ---------------------------------------------------------------------
@@ -152,6 +155,12 @@ contract PartisEventPass is ERC721Enumerable, ReentrancyGuard {
     error StaffLimitReached(uint256 eventId);
     error PassNotValid(uint256 eventId, uint256 tokenId, PassCheck reason);
     error PassAlreadyUsed(uint256 tokenId);
+    error CannotCancel(string reason);
+    error EventNotCancelled(uint256 eventId);
+    error NotPassHolder(uint256 tokenId, address account);
+    error WithdrawLocked(uint256 eventId, uint64 unlocksAt);
+    error NothingToWithdraw(uint256 eventId);
+    error PaymentFailed();
 
     // ---------------------------------------------------------------------
     // Modifiers
@@ -215,6 +224,32 @@ contract PartisEventPass is ERC721Enumerable, ReentrancyGuard {
         if (e.status == EventStatus.Cancelled) revert EventIsCancelled(eventId);
         e.salesPaused = paused;
         emit SalesPausedSet(eventId, paused);
+    }
+
+    /// @notice Cancels an event. Allowed only before it ends and before anyone has checked in,
+    ///         so every issued pass is refundable in full.
+    function cancelEvent(uint256 eventId) external onlyOrganizer(eventId) {
+        EventData storage e = _events[eventId];
+        if (e.status == EventStatus.Cancelled) revert EventIsCancelled(eventId);
+        if (block.timestamp >= e.endTime) revert CannotCancel("event already ended");
+        if (e.checkedIn != 0) revert CannotCancel("attendees already checked in");
+        e.status = EventStatus.Cancelled;
+        emit EventCancelled(eventId);
+    }
+
+    /// @notice Withdraws an event's paid-pass proceeds to its organizer.
+    /// @dev    Locked until the event ends so that attendees can always be refunded if the
+    ///         event is cancelled (cancellation is only possible before the end).
+    function withdrawProceeds(uint256 eventId) external nonReentrant onlyOrganizer(eventId) {
+        EventData storage e = _events[eventId];
+        if (e.status == EventStatus.Cancelled) revert EventIsCancelled(eventId);
+        if (block.timestamp < e.endTime) revert WithdrawLocked(eventId, e.endTime);
+        uint256 amount = e.proceeds;
+        if (amount == 0) revert NothingToWithdraw(eventId);
+
+        e.proceeds = 0;
+        emit ProceedsWithdrawn(eventId, msg.sender, amount);
+        _sendValue(msg.sender, amount);
     }
 
     /// @notice Grants or revokes check-in rights for `account` on one event.
@@ -311,6 +346,25 @@ contract PartisEventPass is ERC721Enumerable, ReentrancyGuard {
 
         // Interaction (onERC721Received on contract wallets) last; guarded by nonReentrant.
         _safeMint(msg.sender, tokenId);
+    }
+
+    /// @notice Burns a pass of a cancelled event and returns what was paid for it to the current holder.
+    function refund(uint256 tokenId) external nonReentrant {
+        address holder = _ownerOf(tokenId);
+        if (holder != msg.sender) revert NotPassHolder(tokenId, msg.sender);
+        PassData storage p = _passes[tokenId];
+        uint256 eventId = p.eventId;
+        EventData storage e = _events[eventId];
+        if (e.status != EventStatus.Cancelled) revert EventNotCancelled(eventId);
+
+        uint256 amount = p.pricePaid;
+        p.pricePaid = 0;
+        e.proceeds -= amount;
+        e.refunded++;
+        _burn(tokenId);
+
+        emit PassRefunded(eventId, tokenId, msg.sender, amount);
+        if (amount != 0) _sendValue(msg.sender, amount);
     }
 
     // ---------------------------------------------------------------------
@@ -428,6 +482,11 @@ contract PartisEventPass is ERC721Enumerable, ReentrancyGuard {
         if (c.checkInStart >= c.checkInEnd) revert InvalidEventConfig("check-in window");
         if (c.checkInEnd > c.endTime) revert InvalidEventConfig("check-in must close by event end");
         if (c.maxSupply == 0 || c.maxSupply > MAX_SUPPLY_PER_EVENT) revert InvalidEventConfig("supply");
+    }
+
+    function _sendValue(address to, uint256 amount) internal {
+        (bool ok,) = payable(to).call{value: amount}("");
+        if (!ok) revert PaymentFailed();
     }
 
     function _slice(uint256[] storage arr, uint256 offset, uint256 limit)
