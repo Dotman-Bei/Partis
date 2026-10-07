@@ -16,4 +16,4 @@ contracts/cache/
 .DS_Store
 contracts/foundry-pp/
 contracts/deployments/31337.json
-contracts/broadcast/
+contracts/broadcast/*/31337/
