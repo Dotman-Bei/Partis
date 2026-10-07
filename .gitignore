@@ -8,10 +8,12 @@ web/next-env.d.ts
 # foundry
 contracts/out/
 contracts/cache/
-contracts/broadcast/*/31337/
 # env
 .env
 .env.*
 !.env.example
 # os
 .DS_Store
+contracts/foundry-pp/
+contracts/deployments/31337.json
+contracts/broadcast/
