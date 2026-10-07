@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { parseEventLogs } from "viem";
 import { partisAbi } from "@/lib/abi";
 import { buildEventConfig, LIMITS, type EventFormValues } from "@/lib/eventForm";
@@ -9,13 +9,18 @@ import { formatDate, formatPrice, formatTime, nowSeconds } from "@/lib/format";
 import { usePartisTx } from "@/hooks/usePartisTx";
 import { Modal } from "./Modal";
 
-function defaults(): EventFormValues {
+/** Local yyyy-mm-dd one week from now. Called on open, never during render. */
+function weekFromNow(): string {
   const d = new Date(Date.now() + 7 * 86_400_000);
   const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+function defaults(): EventFormValues {
   return {
     name: "",
     venue: "",
-    date: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`,
+    date: "",
     startTime: "18:00",
     endTime: "21:00",
     supply: "100",
@@ -38,10 +43,14 @@ export function CreateEventModal({ open, onClose }: { open: boolean; onClose: ()
   const [touched, setTouched] = useState(false);
   const tx = usePartisTx();
 
+  useEffect(() => {
+    if (open) setV((prev) => (prev.date ? prev : { ...prev, date: weekFromNow() }));
+  }, [open]);
+
   const set = <K extends keyof EventFormValues>(key: K, value: EventFormValues[K]) =>
     setV((prev) => ({ ...prev, [key]: value }));
 
-  const built = buildEventConfig(v, nowSeconds());
+  const built = buildEventConfig(v, open ? nowSeconds() : 0);
 
   function close() {
     onClose();

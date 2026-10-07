@@ -24,11 +24,17 @@ const contract = () => ({ address: partisAddress!, abi: partisAbi }) as const;
 
 export const isDeployed = partisAddress !== null;
 
-/** A clock that ticks every `ms`, for countdowns and time-based state. */
+/**
+ * A clock that ticks every `ms`, for countdowns and time-based state. Starts at 0 and is set on
+ * mount: reading the time during prerender is not allowed, and chain data only arrives after
+ * mount anyway.
+ */
 export function useNow(ms = 1000): number {
-  const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
+  const [now, setNow] = useState(0);
   useEffect(() => {
-    const id = setInterval(() => setNow(Math.floor(Date.now() / 1000)), ms);
+    const tick = () => setNow(Math.floor(Date.now() / 1000));
+    tick();
+    const id = setInterval(tick, ms);
     return () => clearInterval(id);
   }, [ms]);
   return now;
