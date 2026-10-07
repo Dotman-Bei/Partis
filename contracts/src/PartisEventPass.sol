@@ -75,6 +75,14 @@ contract PartisEventPass is ERC721Enumerable, ReentrancyGuard {
         uint256 proceeds;
     }
 
+    struct PassData {
+        uint256 eventId;
+        uint64 issuedAt;
+        uint64 checkedInAt;
+        address checkedInBy;
+        uint128 pricePaid;
+    }
+
     // ---------------------------------------------------------------------
     // Storage
     // ---------------------------------------------------------------------
@@ -83,7 +91,16 @@ contract PartisEventPass is ERC721Enumerable, ReentrancyGuard {
     mapping(uint256 eventId => EventData) private _events;
     mapping(address organizer => uint256[]) private _organizerEvents;
 
+    uint256 private _lastTokenId;
+    mapping(uint256 tokenId => PassData) private _passes;
+    mapping(uint256 eventId => uint256[]) private _eventTokenIds;
+    mapping(uint256 eventId => mapping(address account => bool)) private _claimed;
+    mapping(address account => bool) private _isAttendee;
+
     uint256 public totalOrganizers;
+    uint256 public totalAttendees;
+    uint256 public totalPassesIssued;
+    uint256 public totalPaidVolume;
 
     // ---------------------------------------------------------------------
     // Events
@@ -94,6 +111,7 @@ contract PartisEventPass is ERC721Enumerable, ReentrancyGuard {
     );
     event EventDetailsUpdated(uint256 indexed eventId);
     event SalesPausedSet(uint256 indexed eventId, bool paused);
+    event PassIssued(uint256 indexed eventId, uint256 indexed tokenId, address indexed holder, uint256 pricePaid);
 
     // ---------------------------------------------------------------------
     // Errors
@@ -104,6 +122,11 @@ contract PartisEventPass is ERC721Enumerable, ReentrancyGuard {
     error InvalidEventConfig(string reason);
     error EventIsCancelled(uint256 eventId);
     error PageTooLarge(uint256 limit);
+    error SalesPaused(uint256 eventId);
+    error SalesEnded(uint256 eventId);
+    error SoldOut(uint256 eventId);
+    error IncorrectPayment(uint256 expected, uint256 received);
+    error AlreadyClaimed(uint256 eventId, address account);
 
     // ---------------------------------------------------------------------
     // Modifiers
@@ -170,6 +193,47 @@ contract PartisEventPass is ERC721Enumerable, ReentrancyGuard {
     }
 
     // ---------------------------------------------------------------------
+    // Attendee: pass issuance
+    // ---------------------------------------------------------------------
+
+    /// @notice Claims a free pass (send 0) or buys a fixed-price pass (send exactly `price` in BOT).
+    /// @return tokenId The newly issued pass.
+    function claim(uint256 eventId) external payable nonReentrant returns (uint256 tokenId) {
+        EventData storage e = _existingEvent(eventId);
+        if (e.status == EventStatus.Cancelled) revert EventIsCancelled(eventId);
+        if (e.salesPaused) revert SalesPaused(eventId);
+        if (block.timestamp >= e.endTime) revert SalesEnded(eventId);
+        if (e.minted >= e.maxSupply) revert SoldOut(eventId);
+        if (msg.value != e.price) revert IncorrectPayment(e.price, msg.value);
+        if (e.onePerWallet && _claimed[eventId][msg.sender]) revert AlreadyClaimed(eventId, msg.sender);
+
+        // Effects
+        tokenId = ++_lastTokenId;
+        _passes[tokenId] = PassData({
+            eventId: eventId,
+            issuedAt: uint64(block.timestamp),
+            checkedInAt: 0,
+            checkedInBy: address(0),
+            pricePaid: uint128(msg.value)
+        });
+        _eventTokenIds[eventId].push(tokenId);
+        _claimed[eventId][msg.sender] = true;
+        e.minted++;
+        e.proceeds += msg.value;
+        totalPassesIssued++;
+        totalPaidVolume += msg.value;
+        if (!_isAttendee[msg.sender]) {
+            _isAttendee[msg.sender] = true;
+            totalAttendees++;
+        }
+
+        emit PassIssued(eventId, tokenId, msg.sender, msg.value);
+
+        // Interaction (onERC721Received on contract wallets) last; guarded by nonReentrant.
+        _safeMint(msg.sender, tokenId);
+    }
+
+    // ---------------------------------------------------------------------
     // Views
     // ---------------------------------------------------------------------
 
@@ -203,6 +267,43 @@ contract PartisEventPass is ERC721Enumerable, ReentrancyGuard {
         returns (uint256[] memory ids)
     {
         return _slice(_organizerEvents[organizer], offset, limit);
+    }
+
+    function hasClaimed(uint256 eventId, address account) external view returns (bool) {
+        return _claimed[eventId][account];
+    }
+
+    function getPass(uint256 tokenId) external view returns (PassData memory) {
+        return _passes[tokenId];
+    }
+
+    function eventPassCount(uint256 eventId) external view returns (uint256) {
+        return _eventTokenIds[eventId].length;
+    }
+
+    /// @notice Token ids issued for an event, in issuance order. Bounded by MAX_PAGE_SIZE.
+    function getEventTokenIds(uint256 eventId, uint256 offset, uint256 limit)
+        external
+        view
+        returns (uint256[] memory)
+    {
+        return _slice(_eventTokenIds[eventId], offset, limit);
+    }
+
+    /// @notice Token ids currently owned by `owner`. Bounded by MAX_PAGE_SIZE.
+    function getOwnerTokenIds(address owner, uint256 offset, uint256 limit)
+        external
+        view
+        returns (uint256[] memory ids)
+    {
+        if (limit > MAX_PAGE_SIZE) revert PageTooLarge(limit);
+        uint256 bal = balanceOf(owner);
+        if (offset >= bal) return ids;
+        uint256 n = bal - offset < limit ? bal - offset : limit;
+        ids = new uint256[](n);
+        for (uint256 i; i < n; ++i) {
+            ids[i] = tokenOfOwnerByIndex(owner, offset + i);
+        }
     }
 
     // ---------------------------------------------------------------------
