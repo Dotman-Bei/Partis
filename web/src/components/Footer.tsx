@@ -1,13 +1,12 @@
 import Link from "next/link";
 import { explorerUrl, partisAddress, repoUrl, targetChain } from "@/lib/config";
+import { LogoTile } from "./Logo";
 
 export function Footer() {
   return (
     <footer className="footer">
       <div>
-        <span className="logo large" aria-hidden="true">
-          P
-        </span>
+        <LogoTile large />
         <strong>Own the pass. Verify at the door.</strong>
         <p>On-chain event passes, built on BOT Chain.</p>
       </div>

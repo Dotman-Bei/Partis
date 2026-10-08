@@ -23,7 +23,6 @@
   --toast: #1a1914;
   --label: #c9c8bd;
   --text-soft: #e4e3d8;
-  --logo-end: #fff1a3;
 
   --radius-lg: 22px;
   --radius-md: 16px;
@@ -127,18 +126,20 @@ p {
   border-radius: 13px;
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg, var(--yellow), var(--logo-end));
+  background: var(--yellow);
   color: #080808;
-  font-weight: 900;
-  font-size: 20px;
-  letter-spacing: -0.04em;
+}
+
+/* brand/partis-mark.svg on its tile; the mark's 64-unit grid already includes padding. */
+.logo svg {
+  width: 100%;
+  height: 100%;
 }
 
 .logo.large {
   width: 64px;
   height: 64px;
   border-radius: 20px;
-  font-size: 32px;
 }
 
 .nav {

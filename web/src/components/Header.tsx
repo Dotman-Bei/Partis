@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { targetChain } from "@/lib/config";
+import { LogoTile } from "./Logo";
 import { WalletButton } from "./WalletButton";
 
 const NAV = [
@@ -41,9 +42,7 @@ export function Header() {
   return (
     <header className="header">
       <Link href="/" className="brand" aria-label="Partis home">
-        <span className="logo" aria-hidden="true">
-          P
-        </span>
+        <LogoTile />
         <span>
           <h1>Partis</h1>
           <p>Event passes · {targetChain.name}</p>
