@@ -94,7 +94,7 @@ export default function Home() {
           {PILLARS.map((p, i) => (
             <div key={p.title} className="card feature">
               <span className="numbered">0{i + 1}</span>
-              <h4>{p.title}</h4>
+              <h3>{p.title}</h3>
               <p>{p.body}</p>
             </div>
           ))}
@@ -116,7 +116,7 @@ export default function Home() {
           {FLOW.map((s, i) => (
             <div key={s.title} className="card feature">
               <span className="numbered">0{i + 1}</span>
-              <h4>{s.title}</h4>
+              <h3>{s.title}</h3>
               <p>{s.body}</p>
             </div>
           ))}
@@ -131,7 +131,7 @@ export default function Home() {
         </div>
         <div className="grid">
           <div className="card feature">
-            <h4>What lives on-chain.</h4>
+            <h3>What lives on-chain.</h3>
             <div className="split">
               <div className="on">
                 <span className="micro accent">Public — on BOT Chain</span>
@@ -159,7 +159,7 @@ export default function Home() {
           </div>
 
           <div className="card feature">
-            <h4>How a pass is proven at the door.</h4>
+            <h3>How a pass is proven at the door.</h3>
             <div className="strip" aria-label="QR, then chain, then check-in">
               <span>QR</span>
               <span className="arrow" aria-hidden="true">
