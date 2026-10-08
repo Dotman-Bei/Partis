@@ -144,7 +144,7 @@ addresses land in `contracts/deployments/<chainId>.json`, which should be commit
 | Contracts | 59 tests: lifecycle, issuance, check-in threats, transfers, payments/reentrancy, metadata escaping, views, plus 4 stateful invariants (no duplicate check-ins, supply bounds, solvency, cancelled ⇒ no check-ins) | `cd contracts && forge test` |
 | Web logic | 21 tests: entry-QR protocol, door verification for every §23 threat, status mapping, form validation | `cd web && npm test` |
 | On-chain loop | every PRD §5 step and failure path, as real transactions | `./scripts/e2e-local.sh` |
-| UI end-to-end | the full flow through the browser with Playwright | `./scripts/e2e-browser.sh` |
+| UI end-to-end | the full flow through the browser, plus every route at 7 screen sizes (320–1920px) checked for overflow, tap-target size and input zoom | `./scripts/e2e-browser.sh` |
 
 CI (`.github/workflows/ci.yml`) runs formatting, contract tests, lint, type-check, unit tests and
 a production build on every push.

@@ -3,6 +3,20 @@
 A public record of how Partis was built, the decisions made along the way, and what's next.
 Newest entries first.
 
+## 2026-10-08 — Responsive and performance pass
+
+- New Playwright check runs every route at 320, 375, 430, 768, 1024, 1366 and 1920px with real
+  on-chain data: no horizontal overflow anywhere; on touch screens every button is ≥40px tall and
+  form text is 16px (stops iOS zooming into fields).
+- Fixed what it found: the staff dialog overflowed small phones by 162px (full wallet addresses),
+  the create-event dialog by 7px; small buttons were 33px tall on touch screens.
+- Performance: the QR encoder and camera decoder now load only when used (check-in page JS
+  343 → 298KB gzipped); the shipped contract ABI is trimmed to what the app calls (99 → 58
+  entries); countdowns tick in place instead of re-rendering whole pages every second.
+- Lighthouse accessibility is 100 on every page (fixed landing heading order). Profiling showed
+  the remaining load cost is the one-time React/Next and wallet-library startup; pages are idle
+  once loaded.
+
 ## 2026-10-08 — Deployed to BOT Chain Testnet
 
 - Re-verified chain id 968 at `https://rpc.bohr.life` immediately before deploying.
