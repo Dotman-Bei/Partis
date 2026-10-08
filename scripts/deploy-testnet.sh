@@ -13,8 +13,11 @@ EXPLORER=https://scan.bohr.life
 set -a; source "$ENV_FILE"; set +a
 
 RPC=${BOT_TESTNET_RPC:-https://rpc.bohr.life}
-[[ "${PRIVATE_KEY:-}" =~ ^0x[0-9a-fA-F]{64}$ ]] || {
-  echo "PRIVATE_KEY in contracts/.env must be a 0x-prefixed 64-hex-character key." >&2; exit 1; }
+# Accept keys with or without the 0x prefix (wallets often export them without it).
+PRIVATE_KEY=$(tr -d '[:space:]"'"'" <<<"${PRIVATE_KEY:-}")
+[[ "$PRIVATE_KEY" =~ ^(0x)?[0-9a-fA-F]{64}$ ]] || {
+  echo "PRIVATE_KEY in contracts/.env must be a 64-hex-character key (0x prefix optional)." >&2; exit 1; }
+[[ "$PRIVATE_KEY" == 0x* ]] || PRIVATE_KEY="0x$PRIVATE_KEY"
 
 echo "▸ Checking network (PRD §24: never trust remembered values)"
 CHAIN_ID=$(cast chain-id --rpc-url "$RPC")
