@@ -118,7 +118,7 @@ test("organizer adds staff; staff verifies and checks in; replay is rejected", a
   const staffDialog = orgPage.getByRole("dialog", { name: "Check-in staff" });
   await staffDialog.getByLabel("Staff wallet address").fill(ACCOUNTS.staff);
   await staffDialog.getByRole("button", { name: "Add" }).click();
-  await expect(staffDialog.getByText(ACCOUNTS.staff)).toBeVisible({ timeout: 20_000 });
+  await expect(staffDialog.getByTitle(ACCOUNTS.staff)).toBeVisible({ timeout: 20_000 });
 
   // Staff scans (pastes) the signed QR.
   const page = await (await browser.newContext()).newPage();

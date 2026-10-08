@@ -71,7 +71,7 @@ export function StaffModal({ event: e, open, onClose }: { event: PartisEvent; op
             {staff.data!.map((a) => (
               <tr key={a}>
                 <td>
-                  <AddressLink address={a} label={a} />
+                  <AddressLink address={a} />
                 </td>
                 <td style={{ textAlign: "right" }}>
                   <button

@@ -14,9 +14,21 @@ export function TxLink({ hash, label = "View transaction ↗" }: { hash: Hash; l
 
 export function AddressLink({ address, label }: { address: Address; label?: string }) {
   const text = label ?? shortAddress(address);
-  if (!explorerUrl) return <span className="mono">{text}</span>;
+  if (!explorerUrl) {
+    return (
+      <span className="mono" title={address}>
+        {text}
+      </span>
+    );
+  }
   return (
-    <a className="link mono" href={`${explorerUrl}/address/${address}`} target="_blank" rel="noreferrer">
+    <a
+      className="link mono"
+      href={`${explorerUrl}/address/${address}`}
+      target="_blank"
+      rel="noreferrer"
+      title={address}
+    >
       {text}
     </a>
   );
