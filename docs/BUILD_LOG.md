@@ -3,6 +3,18 @@
 A public record of how Partis was built, the decisions made along the way, and what's next.
 Newest entries first.
 
+## 2026-10-08 — Deployed to BOT Chain Testnet
+
+- Re-verified chain id 968 at `https://rpc.bohr.life` immediately before deploying.
+- `PartisEventPass` → [`0x07aF133344a4da79872117e612febCf4851798F5`](https://scan.bohr.life/address/0x07aF133344a4da79872117e612febCf4851798F5)
+- `PartisPassRenderer` → [`0x0405b784346330f690c85A559ba4C2B05e610650`](https://scan.bohr.life/address/0x0405b784346330f690c85A559ba4C2B05e610650)
+- Deployed at block 26131805; both contracts verified on BOTScan (Blockscout) via
+  `forge --verifier blockscout`. Verification took ~20s in the explorer's queue.
+- Confirmed on-chain: `renderer()` points at the renderer, `eventCount()` is 0, and the web app
+  reads live testnet state.
+- Deployment record: `contracts/deployments/968.json` and `contracts/broadcast/Deploy.s.sol/968/`.
+- Next: host the frontend publicly, run a real testnet event, record the demo.
+
 ## 2026-10-07 — MVP code complete (M1–M4)
 
 **Shipped**
