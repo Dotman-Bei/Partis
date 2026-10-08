@@ -1,5 +1,7 @@
-import { createConfig, http } from "wagmi";
-import { injected } from "wagmi/connectors";
+// `injected` comes from the core package: importing it from "wagmi/connectors" pulls the
+// Coinbase, WalletConnect and MetaMask SDK connectors into every page even though Partis
+// only uses the browser's injected wallet.
+import { createConfig, http, injected } from "wagmi";
 import { getAddress, isAddress, type Address } from "viem";
 import { chainById } from "./chains";
 
