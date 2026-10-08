@@ -8,7 +8,7 @@ import { PassCard } from "@/components/PassCard";
 import { PassQrModal } from "@/components/PassQrModal";
 import { Empty, LoadError, NotDeployedGate, SkeletonGrid, Tile } from "@/components/ui";
 import { WalletButton } from "@/components/WalletButton";
-import { useNow, useOwnedPasses, type OwnedPass } from "@/hooks/usePartis";
+import { STATUS_TICK_MS, useNow, useOwnedPasses, type OwnedPass } from "@/hooks/usePartis";
 import { formatDate } from "@/lib/format";
 import { passStatus } from "@/lib/status";
 
@@ -35,7 +35,7 @@ export default function PassesPage() {
 function Passes() {
   const { address } = useConnection();
   const owned = useOwnedPasses(address);
-  const now = useNow(1000);
+  const now = useNow(STATUS_TICK_MS);
   const [qr, setQr] = useState<OwnedPass | null>(null);
 
   if (!address) {

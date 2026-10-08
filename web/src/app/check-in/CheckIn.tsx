@@ -11,7 +11,7 @@ import { formatDateTime, formatTime, nowSeconds, shortAddress } from "@/lib/form
 import { eventBadge, isCheckInOpen } from "@/lib/status";
 import { verifyEntry, type Verdict } from "@/lib/verify";
 import { PassCheck } from "@/lib/types";
-import { useEvent, useIsOperator, useNow, useOrganizerEvents } from "@/hooks/usePartis";
+import { STATUS_TICK_MS, useEvent, useIsOperator, useNow, useOrganizerEvents } from "@/hooks/usePartis";
 import { usePartisTx } from "@/hooks/usePartisTx";
 import { AddressLink } from "@/components/ExplorerLink";
 import { QrScanner } from "@/components/QrScanner";
@@ -110,7 +110,7 @@ function Desk({ eventId }: { eventId: bigint }) {
   const event = useEvent(eventId);
   const operator = useIsOperator(eventId, address);
   const tx = usePartisTx();
-  const now = useNow(1000);
+  const now = useNow(STATUS_TICK_MS);
 
   const [scanning, setScanning] = useState(false);
   const [manual, setManual] = useState("");

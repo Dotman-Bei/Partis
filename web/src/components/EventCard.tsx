@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { PartisEvent } from "@/lib/types";
 import { eventBadge, eventNote, hasEnded, isCancelled } from "@/lib/status";
 import { formatDate, formatDuration, formatPrice, formatTime } from "@/lib/format";
+import { Ticker } from "./Ticker";
 import { Badge, SupplyBar, Tile } from "./ui";
 
 /** Countdown line under the meta tiles, like the market card's timer (§6.2). */
@@ -44,7 +45,7 @@ export function EventCard({ event: e, now, action }: { event: PartisEvent; now: 
       </div>
       <SupplyBar minted={e.minted} max={e.maxSupply} />
       <p className="timer" style={{ marginTop: 10 }}>
-        {timing(e, now)}
+        <Ticker>{(t) => timing(e, t)}</Ticker>
       </p>
 
       <div className="divider-row">

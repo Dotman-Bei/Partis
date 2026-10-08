@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { EventCard } from "@/components/EventCard";
 import { Empty, LoadError, NotDeployedGate, SkeletonGrid } from "@/components/ui";
-import { useAllEvents, useNow, useOwnedPasses } from "@/hooks/usePartis";
+import { STATUS_TICK_MS, useAllEvents, useNow, useOwnedPasses } from "@/hooks/usePartis";
 import { claimBlocker, hasEnded, isCancelled } from "@/lib/status";
 import type { PartisEvent } from "@/lib/types";
 
@@ -36,7 +36,7 @@ function EventsList() {
   const { address } = useConnection();
   const events = useAllEvents();
   const owned = useOwnedPasses(address);
-  const now = useNow(1000);
+  const now = useNow(STATUS_TICK_MS);
 
   const heldEventIds = useMemo(
     () => new Set((owned.data ?? []).map((p) => p.pass.eventId)),

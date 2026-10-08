@@ -29,6 +29,9 @@ export const isDeployed = partisAddress !== null;
  * mount: reading the time during prerender is not allowed, and chain data only arrives after
  * mount anyway.
  */
+/** How often time-based statuses (badges, filters, claim availability) refresh. */
+export const STATUS_TICK_MS = 15_000;
+
 export function useNow(ms = 1000): number {
   const [now, setNow] = useState(0);
   useEffect(() => {

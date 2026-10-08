@@ -9,7 +9,8 @@ import { targetChain } from "@/lib/config";
 import { formatDate, formatDateTime, formatDuration, formatPrice, formatTime } from "@/lib/format";
 import { claimBlocker, eventBadge, eventNote, isCancelled, passBadge, passStatus } from "@/lib/status";
 import type { PartisEvent, PassView } from "@/lib/types";
-import { useEvent, useHasClaimed, useNow, useOwnedPasses } from "@/hooks/usePartis";
+import { STATUS_TICK_MS, useEvent, useHasClaimed, useNow, useOwnedPasses } from "@/hooks/usePartis";
+import { Ticker } from "@/components/Ticker";
 import { usePartisTx } from "@/hooks/usePartisTx";
 import { AddressLink } from "@/components/ExplorerLink";
 import { Modal } from "@/components/Modal";
@@ -45,7 +46,7 @@ function NotFound() {
 
 function EventDetail({ id }: { id: bigint }) {
   const event = useEvent(id);
-  const now = useNow(1000);
+  const now = useNow(STATUS_TICK_MS);
   const toast = useToast();
 
   if (event.isPending) return <div className="skeleton" style={{ minHeight: 420 }} aria-busy="true" />;
@@ -99,13 +100,17 @@ function EventFacts({ e, now }: { e: PartisEvent; now: number }) {
       <div className="card-top">
         <span className="card-id">Details</span>
         <span className="timer">
-          {isCancelled(e)
-            ? "Cancelled"
-            : now < start
-              ? `Starts in ${formatDuration(start - now)}`
-              : now < Number(e.endTime)
-                ? "Happening now"
-                : "Ended"}
+          <Ticker>
+            {(t) =>
+              isCancelled(e)
+                ? "Cancelled"
+                : t < start
+                  ? `Starts in ${formatDuration(start - t)}`
+                  : t < Number(e.endTime)
+                    ? "Happening now"
+                    : "Ended"
+            }
+          </Ticker>
         </span>
       </div>
       <div className="meta">
@@ -182,7 +187,7 @@ function PassPanel({ e, now }: { e: PartisEvent; now: number }) {
           tokenId: issued.args.tokenId,
           eventId: e.id,
           owner: address!,
-          issuedAt: BigInt(now),
+          issuedAt: BigInt(Math.floor(Date.now() / 1000)),
           checkedInAt: 0n,
           checkedInBy: "0x0000000000000000000000000000000000000000",
           pricePaid: e.price,
