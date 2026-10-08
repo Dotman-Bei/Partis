@@ -89,7 +89,7 @@ docs/
 Requirements: [Foundry](https://getfoundry.sh), Node 22+, `jq`.
 
 ```bash
-git clone --recurse-submodules <repo-url> partis && cd partis
+git clone --recurse-submodules https://github.com/Dotman-Bei/Partis.git && cd Partis
 
 # Contracts
 cd contracts && forge test && cd ..
