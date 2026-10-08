@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import jsQR from "jsqr";
 
 interface Props {
   active: boolean;
@@ -49,6 +48,9 @@ export function QrScanner({ active, onScan }: Props) {
       }
       video.current.srcObject = stream;
       await video.current.play().catch(() => undefined);
+      // Loaded on demand: the decoder is only needed once the camera is running.
+      const { default: jsQR } = await import("jsqr");
+      if (stopped) return;
 
       timer = setInterval(() => {
         const v = video.current;

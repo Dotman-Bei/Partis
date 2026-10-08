@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import QRCode from "qrcode";
 import { useConnection, useSignMessage } from "wagmi";
 import { isAddressEqual } from "viem";
 import { partisAddress, targetChain } from "@/lib/config";
@@ -35,6 +34,8 @@ export function PassQrModal({ open, onClose, pass, event }: Props) {
   const isHolder = !!address && isAddressEqual(address, pass.owner);
 
   async function render(text: string, issuedAt?: number) {
+    // Loaded on demand: only people opening a pass QR need the encoder.
+    const { default: QRCode } = await import("qrcode");
     const url = await QRCode.toDataURL(text, { errorCorrectionLevel: "M", margin: 1, width: 640 });
     setQr({ url, issuedAt });
   }
