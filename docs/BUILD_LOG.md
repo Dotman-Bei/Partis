@@ -13,7 +13,9 @@ Newest entries first.
 - Confirmed on-chain: `renderer()` points at the renderer, `eventCount()` is 0, and the web app
   reads live testnet state.
 - Deployment record: `contracts/deployments/968.json` and `contracts/broadcast/Deploy.s.sol/968/`.
-- Next: host the frontend publicly, run a real testnet event, record the demo.
+- Frontend live at https://partis-seven.vercel.app (Vercel, root `web`, testnet config);
+  checked in a browser: all routes load, live testnet reads, no console errors.
+- Next: run a real testnet event, record the demo.
 
 ## 2026-10-07 — MVP code complete (M1–M4)
 
