@@ -43,6 +43,7 @@ body {
 
 body {
   min-height: 100vh;
+  min-height: 100dvh;
   font-family: var(--font);
   color: var(--text);
   background:
@@ -623,6 +624,7 @@ p {
 .sentence .select {
   display: inline-block;
   width: auto;
+  max-width: 100%;
   padding: 4px 10px;
   margin: 2px 2px;
   font-size: 16px;
@@ -707,7 +709,10 @@ p {
 .modal {
   width: min(560px, 100%);
   max-height: calc(100vh - 40px);
+  max-height: calc(100dvh - 40px);
   overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
   background: var(--modal);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -743,6 +748,17 @@ p {
 .modal-body {
   display: grid;
   gap: 14px;
+}
+
+.modal-body > *,
+.stack > *,
+.grid > * {
+  min-width: 0;
+}
+
+.row > .input {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .modal-actions {
@@ -1218,6 +1234,36 @@ p {
   }
 }
 
+/* Touch screens: comfortable tap targets (~44px) without changing the desktop density. */
+@media (pointer: coarse) {
+  .btn {
+    min-height: 44px;
+  }
+
+  /* iOS zooms into form fields with text under 16px. */
+  .input,
+  .select,
+  .textarea {
+    font-size: 16px;
+  }
+
+  .btn.small,
+  .chip {
+    min-height: 40px;
+  }
+
+  .close {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .nav.open a {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     transition: none !important;
@@ -1262,6 +1308,12 @@ p {
 }
 
 @media (max-width: 850px) {
+  .input,
+  .select,
+  .textarea {
+    font-size: 16px;
+  }
+
   .grid,
   .grid.three {
     grid-template-columns: 1fr;
