@@ -130,7 +130,7 @@ The web app runs against one chain per build (`NEXT_PUBLIC_CHAIN_ID`, `NEXT_PUBL
 
 | Network | PartisEventPass | PartisPassRenderer |
 |---|---|---|
-| BOT Chain Testnet (968) | [`0x07aF133344a4da79872117e612febCf4851798F5`](https://scan.bohr.life/address/0x07aF133344a4da79872117e612febCf4851798F5) ✓ verified | [`0x0405b784346330f690c85A559ba4C2B05e610650`](https://scan.bohr.life/address/0x0405b784346330f690c85A559ba4C2B05e610650) ✓ verified |
+| BOT Chain Testnet (968) | [`0x4caC8911DC322033861cda5Bc18d1496102b3ff9`](https://scan.bohr.life/address/0x4caC8911DC322033861cda5Bc18d1496102b3ff9) ✓ verified | [`0x17411D09105d3276B75a5423ecE3494814050f87`](https://scan.bohr.life/address/0x17411D09105d3276B75a5423ecE3494814050f87) ✓ verified |
 | BOT Chain Mainnet | *not deployed yet* | *not deployed yet* |
 
 Deploying needs a funded deployer wallet: fill in `contracts/.env` (from `.env.example`) and run
@@ -194,7 +194,7 @@ same live counters.
 | Item | Status |
 |---|---|
 | Contracts written, tested, verified-ready | ✅ done (59 tests, invariants, threat model) |
-| Contracts deployed + verified on BOT Chain | ✅ testnet, deployed and verified on BOTScan 2026-10-08 (block 26131805); mainnet ⏳ after the validation gate |
+| Contracts deployed + verified on BOT Chain | ✅ testnet, deployed and verified on BOTScan 2026-10-10 (block 26403956); mainnet ⏳ after the validation gate |
 | Frontend: 6 routes, wallet, create, claim/buy, QR, scan, check-in, organizer, discovery, error states | ✅ done, tested end-to-end in a browser |
 | Ownership verifiable, used pass rejected, unauthorized check-in prevented, wrong event rejected | ✅ enforced on-chain and covered by tests |
 | README, threat model | ✅ |

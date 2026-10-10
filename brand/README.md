@@ -51,10 +51,10 @@ These are the same tokens as the app (`web/src/app/globals.css`).
 - Don't retype the wordmark in a live font. Use the outlined files.
 - Don't stretch, rotate or set the mark inside other shapes than the rounded square tile.
 
-## Note on the deployed NFT art
+## Pass art
 
-`PartisPassRenderer` on testnet (`0x0405b784346330f690c85A559ba4C2B05e610650`) was deployed
-before this logo and draws the earlier "P" tile in pass images. The contract is immutable, so
-updating the pass art means deploying a new renderer with the next contract release.
+Pass images are drawn on-chain by `PartisPassRenderer`, which embeds this mark and the outlined
+wordmark (`_brand()` in `contracts/src/PartisPassRenderer.sol`). The current testnet renderer is
+`0x17411D09105d3276B75a5423ecE3494814050f87`. The first testnet deployment (`0x0405b784346330f690c85A559ba4C2B05e610650`) predates the logo and is retired.
 
 Inter is © The Inter Project Authors, SIL Open Font License 1.1.

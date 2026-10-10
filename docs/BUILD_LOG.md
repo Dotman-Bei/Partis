@@ -3,6 +3,18 @@
 A public record of how Partis was built, the decisions made along the way, and what's next.
 Newest entries first.
 
+## 2026-10-10 — Testnet redeploy with the new pass art
+
+- `PartisPassRenderer` now draws the new Partis mark and outlined wordmark in every pass image
+  (checked by minting locally and rendering the on-chain SVG). Renderer bytecode 6.6KB → 9.5KB.
+- Because `PartisEventPass` references its renderer immutably, both contracts were redeployed:
+  - `PartisEventPass` → [`0x4caC8911DC322033861cda5Bc18d1496102b3ff9`](https://scan.bohr.life/address/0x4caC8911DC322033861cda5Bc18d1496102b3ff9)
+  - `PartisPassRenderer` → [`0x17411D09105d3276B75a5423ecE3494814050f87`](https://scan.bohr.life/address/0x17411D09105d3276B75a5423ecE3494814050f87)
+  - block 26403956, both verified on BOTScan.
+- The first testnet deployment (`0x07aF133344a4da79872117e612febCf4851798F5`) had no events or passes, so nothing was migrated; it is
+  retired.
+- Mainnet will deploy this same source, so its pass art is correct from day one.
+
 ## 2026-10-08 — Responsive and performance pass
 
 - New Playwright check runs every route at 320, 375, 430, 768, 1024, 1366 and 1920px with real
