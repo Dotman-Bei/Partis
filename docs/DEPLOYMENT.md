@@ -68,6 +68,8 @@ with an encrypted Foundry keystore instead of a key in a file.
 
 ## 2. Testnet validation gate (before mainnet)
 
+Step-by-step checklist: [TESTNET_TEST_PLAN.md](TESTNET_TEST_PLAN.md).
+
 Mainnet goes ahead only when all of these hold:
 
 - [ ] All contract, unit and browser tests pass on the release commit.
