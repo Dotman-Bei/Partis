@@ -21,3 +21,4 @@ web/test-results/
 web/playwright-report/
 web/e2e/screenshots/
 .anvil-state.json
+.test-wallets.env
