@@ -3,6 +3,38 @@
 A public record of how Partis was built, the decisions made along the way, and what's next.
 Newest entries first.
 
+## 2026-10-10 — Automated testnet test run (pre-mainnet gate)
+
+Ran every step of `docs/TESTNET_TEST_PLAN.md` against the live testnet contract
+`0x4caC8911DC322033861cda5Bc18d1496102b3ff9`, driving the real UI in a browser with three
+dedicated test wallets (organizer, attendee, staff). **All 9 groups / 22 checks passed:**
+
+- organizer created a paid, a free and a to-be-cancelled event and authorized a staff wallet;
+- attendee bought a paid pass, claimed a free one; a second purchase was not offered in the UI
+  and reverted on-chain (`AlreadyClaimed`);
+- attendee signed an entry QR (decoded from the rendered image); staff saw "Valid pass" with the
+  holder signature verified and checked the pass in on-chain;
+- rejected as expected: replayed QR (Already checked in), pass from another event, nonexistent
+  pass, an 11-minute-old QR, a non-staff wallet (UI + `NotCheckInOperator`), and transferring the
+  used pass (`PassAlreadyUsed`);
+- My Passes showed CHECKED IN; cancelled event refunded 0.5 tBOT; organizer withdrew 0.5 tBOT
+  after the paid event ended.
+
+Notes:
+- **This is test activity, not usage.** Every event is named "Partis test run"; the metrics below
+  must not be reported as traction.
+- Vercel's Security Checkpoint blocked the automated headless browser on
+  partis-seven.vercel.app after repeated loads, so the run used a local production build of the
+  same commit pointed at the same live contract. Normal visitors were unaffected.
+- Two earlier attempts aborted before any passes were issued (one hung on a test-harness wait,
+  one hit the Vercel checkpoint), leaving test events #1–#4 with no passes.
+- Not covered by automation: scanning with a physical phone camera.
+
+```
+Events created 7 · Organizers 1 · Unique attendees 1 · Passes issued 3 · Check-ins 1 ·
+Paid pass volume 1 tBOT   (all test activity)
+```
+
 ## 2026-10-10 — Testnet redeploy with the new pass art
 
 - `PartisPassRenderer` now draws the new Partis mark and outlined wordmark in every pass image
