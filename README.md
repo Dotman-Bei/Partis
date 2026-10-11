@@ -2,7 +2,7 @@
 
 **Partis turns real-world event access into on-chain passes that can be verified at the door.**
 
-**Live app (BOT Chain Testnet):** https://partis-seven.vercel.app
+**Live app (BOT Chain Mainnet):** https://partis-seven.vercel.app
 
 Organizers create events on BOT Chain. Attendees claim free passes or buy fixed-price ones
 straight into their wallet. At the venue, staff scan the attendee's QR, Partis checks the pass
@@ -198,7 +198,7 @@ same live counters.
 | Frontend: 6 routes, wallet, create, claim/buy, QR, scan, check-in, organizer, discovery, error states | ✅ done, tested end-to-end in a browser |
 | Ownership verifiable, used pass rejected, unauthorized check-in prevented, wrong event rejected | ✅ enforced on-chain and covered by tests |
 | README, threat model | ✅ |
-| Frontend deployed | ✅ https://partis-seven.vercel.app (Vercel, BOT Chain Testnet) |
+| Frontend deployed | ✅ https://partis-seven.vercel.app (Vercel, BOT Chain Mainnet) |
 | Testnet testing with real users, real event, demo video, mainnet | ⏳ not done yet — these need real people and funds |
 
 ## License
