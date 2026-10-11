@@ -3,6 +3,24 @@
 A public record of how Partis was built, the decisions made along the way, and what's next.
 Newest entries first.
 
+## 2026-10-11 — Deployed to BOT Chain Mainnet
+
+- Re-verified on deployment day from dev-docs.botchain.ai and the live RPC: chain id 677,
+  `https://rpc.botchain.ai`, explorer `https://scan.botchain.ai`.
+- Gas: mainnet has no base fee and the tx pool rejects anything under **20 gwei** ("gasPrice too
+  low" at 19 gwei, probed with an empty wallet). Deployed at exactly 20 gwei, legacy, no tip, with
+  a 10% gas-estimate margin.
+- `PartisEventPass` → [`0x27e12C1059F21169Bc6652E624D57A5C9ff77302`](https://scan.botchain.ai/address/0x27e12C1059F21169Bc6652E624D57A5C9ff77302)
+- `PartisPassRenderer` → [`0x14D79d1e58305fB1c7D510AD45939ea21b61BaCe`](https://scan.botchain.ai/address/0x14D79d1e58305fB1c7D510AD45939ea21b61BaCe)
+- Block 26325389; both verified on BOTScan. Cost **0.1216 BOT** (6.08M gas) from a dedicated
+  deployer wallet funded with 0.14 BOT.
+- Same source as the tested testnet deployment, including the new pass art.
+- Deployed before a real event with real attendees had been run on testnet (the gate in
+  `DEPLOYMENT.md` asked for one). The automated testnet run passed every check; the first real
+  events on mainnet should be watched closely.
+- A bug in the new mainnet script's balance guard (64-bit overflow let it proceed with an empty
+  wallet) was caught in a dry run with 0 BOT and fixed before funding; nothing was spent.
+
 ## 2026-10-10 — Automated testnet test run (pre-mainnet gate)
 
 Ran every step of `docs/TESTNET_TEST_PLAN.md` against the live testnet contract

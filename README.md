@@ -122,7 +122,7 @@ Verified from the official BOT Chain developer docs on 2026-10-07; see
 | | Chain ID | RPC | Explorer |
 |---|---|---|---|
 | BOT Chain Testnet | 968 | https://rpc.bohr.life | https://scan.bohr.life |
-| BOT Chain Mainnet | 677 | https://rpc.botchain.ai | https://scan.botchain.ai |
+| BOT Chain Mainnet (677) | [`0x27e12C1059F21169Bc6652E624D57A5C9ff77302`](https://scan.botchain.ai/address/0x27e12C1059F21169Bc6652E624D57A5C9ff77302) ✓ verified | [`0x14D79d1e58305fB1c7D510AD45939ea21b61BaCe`](https://scan.botchain.ai/address/0x14D79d1e58305fB1c7D510AD45939ea21b61BaCe) ✓ verified |
 
 The web app runs against one chain per build (`NEXT_PUBLIC_CHAIN_ID`, `NEXT_PUBLIC_PARTIS_ADDRESS`).
 
@@ -194,7 +194,7 @@ same live counters.
 | Item | Status |
 |---|---|
 | Contracts written, tested, verified-ready | ✅ done (59 tests, invariants, threat model) |
-| Contracts deployed + verified on BOT Chain | ✅ testnet, deployed and verified on BOTScan 2026-10-10 (block 26403956); mainnet ⏳ after the validation gate |
+| Contracts deployed + verified on BOT Chain | ✅ testnet (2026-10-10) and **mainnet (2026-10-11, block 26325389)**, both verified on BOTScan |
 | Frontend: 6 routes, wallet, create, claim/buy, QR, scan, check-in, organizer, discovery, error states | ✅ done, tested end-to-end in a browser |
 | Ownership verifiable, used pass rejected, unauthorized check-in prevented, wrong event rejected | ✅ enforced on-chain and covered by tests |
 | README, threat model | ✅ |

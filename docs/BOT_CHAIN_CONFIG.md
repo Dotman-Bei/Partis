@@ -35,3 +35,5 @@ Re-verify before every deployment.
 4. **Explorers are Blockscout**, so verification uses
    `forge verify-contract --verifier blockscout --verifier-url https://scan.bohr.life/api/`.
 5. Average block time on testnet was ~0.67s at verification time.
+6. **Mainnet minimum gas price is 20 gwei** (probed 2026-10-11: 19 gwei is rejected with
+   "gasPrice too low"; there is no base fee). The RPC's `eth_gasPrice` also returns 20 gwei.
