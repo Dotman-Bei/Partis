@@ -3,6 +3,41 @@
 A public record of how Partis was built, the decisions made along the way, and what's next.
 Newest entries first.
 
+## 2026-10-11 — Mainnet smoke test (team-operated)
+
+**Disclosure: this is team verification of the deployment, not user activity.** Five wallets
+created and funded by the team ran the full flow on mainnet event **#1, "Partis mainnet smoke
+test"** (its on-chain description also says "Not user activity"). These wallets, event #1 and
+passes #1–#4 must be excluded from any usage metrics or milestone reporting.
+
+| Wallet | Role | Address |
+|---|---|---|
+| W1 | organizer | `0xFA2077bAb4835fFfC0dA0175c476d4059B767E3c` |
+| W2 | staff + attendee | `0xF192ef80747a08Ac865FDd574E1811d1acd12d31` |
+| W3 | attendee | `0x1E6cD1338155d1ab75b047d051a6FbA3405F1d87` |
+| W4 | attendee | `0x378a074fb23712F31d457e94f1Aa584cf1977dE9` |
+| W5 | attendee | `0xF76682Cd505DB117c4A04E59B94464f7A0D52FB0` |
+
+| # | Action | Gas | |
+|---|---|---|---|
+| 1 | W1 creates free event | 390,222 | [tx](https://scan.botchain.ai/tx/0xccae9c8621c69965bbf04e9a0c53601ecee5afcdc4205e433bf9475a5ee67ef2) |
+| 2 | W1 adds W2 as staff (event #1) | 94,098 | [tx](https://scan.botchain.ai/tx/0x20a7fcf415016239f5006627b66cbd93c4e375cde0b5a6fdb7af0d7220567495) |
+| 3 | W2 claims a pass | 366,798 | [tx](https://scan.botchain.ai/tx/0x84cd6446ef70d89f869b6c3e2ea0ed98cfa3e52a8d755d3b55a6a14cf732eec8) |
+| 4 | W3 claims a pass | 301,198 | [tx](https://scan.botchain.ai/tx/0x4750e4ee943305347790beef589f93f50a23cf70999d88a002083e15510ac242) |
+| 5 | W4 claims a pass | 301,198 | [tx](https://scan.botchain.ai/tx/0x179fec0e74aef9c21b2a3e106a38049011a11815317e1bb5cf3da49d586323f3) |
+| 6 | W5 claims a pass | 301,198 | [tx](https://scan.botchain.ai/tx/0x6b9faa62090a3e2cdaf5c6a586779cedda3616790dcb79e11fb5c79e1358502b) |
+| 7 | W2 (staff) checks in W3 (pass #2) | 93,346 | [tx](https://scan.botchain.ai/tx/0x2209d538b932df875d3ccf8c5a1d8ac1d047962c715aa1ee2e313f689b9d5ea6) |
+| 8 | W2 (staff) checks in W4 (pass #3) | 76,246 | [tx](https://scan.botchain.ai/tx/0xddeea6a15373f20615408993d8a2d3c734855d16a59a9f532ef415a87dc4f358) |
+| 9 | W1 (organizer) checks in W5 (pass #4) | 73,975 | [tx](https://scan.botchain.ai/tx/0x3bc18ba0c3177cb0b53d4b2e895c015a842d722c4e28976149e313ba3adbfea5) |
+| 10 | W1 (organizer) checks in W2 (pass #1) | 73,975 | [tx](https://scan.botchain.ai/tx/0xb150ad10566fa9683bef80ec8bc4f863d591ac6f0c8a6ec7fd2e9db1b3fd1163) |
+
+- All 10 succeeded at 20 gwei (legacy, no tip): ~2.07M gas ≈ 0.0415 BOT.
+- Free simulations (no transactions): a replayed check-in and a second claim from the same
+  wallet were both rejected. `verifyPass` reports all four passes as AlreadyCheckedIn.
+- Afterwards the remaining 0.010455 BOT was returned to the funding address in 5 plain
+  transfers; all five wallets are empty.
+- Reproducible with `CONFIRM_MAINNET=yes ./scripts/mainnet-smoke-test.sh`.
+
 ## 2026-10-11 — Deployed to BOT Chain Mainnet
 
 - Re-verified on deployment day from dev-docs.botchain.ai and the live RPC: chain id 677,

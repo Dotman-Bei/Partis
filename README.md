@@ -161,6 +161,11 @@ external audit.
 
 ## Metrics
 
+> **Team activity is excluded.** Mainnet event #1 ("Partis mainnet smoke test") and its four
+> passes were created by five team-operated wallets to verify the deployment; see
+> [docs/BUILD_LOG.md](docs/BUILD_LOG.md) for the wallet list and every transaction. They are not
+> users and must be subtracted from the counters below.
+
 All usage numbers come from chain state; nothing is estimated or seeded.
 
 ```bash
