@@ -15,6 +15,9 @@ export const partisAddress: Address | null = isAddress(rawAddress) ? getAddress(
 
 export const explorerUrl = targetChain.blockExplorers?.default.url ?? null;
 
+/** BOT Chain's official website (botchain.ai redirects here). */
+export const botChainWebsite = "https://www.botchain.ai";
+
 export const repoUrl = process.env.NEXT_PUBLIC_REPO_URL || null;
 
 export const wagmiConfig = createConfig({

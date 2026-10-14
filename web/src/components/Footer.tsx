@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { explorerUrl, partisAddress, repoUrl, targetChain } from "@/lib/config";
+import { botChainWebsite, explorerUrl, partisAddress, repoUrl, targetChain } from "@/lib/config";
 import { LogoTile } from "./Logo";
 
 export function Footer() {
@@ -27,8 +27,20 @@ export function Footer() {
           </a>
         )}
       </nav>
+      <div className="footer-chain" aria-label="Built on BOT Chain">
+        <span className="micro">Built on</span>
+        <strong className="footer-chain-name">BOT Chain</strong>
+        <a href={botChainWebsite} target="_blank" rel="noreferrer">
+          Official website ↗
+        </a>
+        {explorerUrl && (
+          <a href={explorerUrl} target="_blank" rel="noreferrer">
+            BOT Chain Explorer ↗
+          </a>
+        )}
+      </div>
       <div className="footer-meta">
-        <span>Built on {targetChain.name}</span>
+        <span>Running on {targetChain.name}</span>
         <span>© 2026 Partis</span>
       </div>
     </footer>
